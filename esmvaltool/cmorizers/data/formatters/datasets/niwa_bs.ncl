@@ -6,19 +6,20 @@
 ;    Tier 3: restricted dataset.
 ;
 ; Source
-;    http://www.bodekerscientific.com/data/total-column-ozone
+;    https://zenodo.org/records/7447757 
 ;
 ; Last access
 ;    20190207
 ;
 ; Download and processing instructions
-;    To get the access data send an email to datasets@bodekerscientific.com
+;    To get the access data send an email to greg@bodekerscientific.com
 ;    Download all files from
-;      ftp://ftp.bodekerscientific.com/CombinedTCOV3.3/Monthly/Patched/NetCDF/
+;      https://zenodo.org/records/7447757 
 ;    Newer versions may become available over time, but make sure to download
-;    the patched one. Only complete years should be downloaded.
+;    the filled one. Only complete years should be downloaded.
 ;
 ; Modification history
+;    20240126-marie-pierre_moine: adaptation to NIWA-BS v3.4.1.
 ;    20190207-righi_mattia: renamed to NIWA-BS and adapted to v2.
 ;    20140528-gottschaldt_klaus-dirk: written.
 ;
@@ -39,7 +40,7 @@ begin
 
   ; Period
   YEAR1 = get_year(start_year, 1979)
-  YEAR2 = get_year(end_year, 2016)
+  YEAR2 = get_year(end_year, 2019)
 
   ; Selected variable (standard name)
   VAR = (/"toz", "tozStderr"/)
@@ -60,11 +61,11 @@ begin
   TYPE = "sat"
 
   ; Version
-  VERSION = "V3.3"
+  VERSION = "V3.4.1"
 
   ; Global attributes
-  SOURCE = "http://www.bodekerscientific.com/data/total-column-ozone"
-  REF = "Bodeker et al., Atmos. Chem. Phys., doi:10.5194/acp-5-2603-2005, 2005"
+  SOURCE = "https://zenodo.org/records/7447757"
+  REF = "Publication: Bodeker et al., Atmos. Chem. Phys., doi:10.5194/acp-5-2603-2005, 2005 | Dataset: Bodeker et al., 2022, doi:10.5281/zenodo.3908787"
   COMMENT = ""
 
 end
@@ -72,8 +73,8 @@ end
 begin
 
   files = systemfunc("ls " + input_dir_path + \
-                     "NIWA-BS_CombinedTCO_" + VERSION + \
-                     "_????_Monthly_Patched.nc")
+                     "BSFilledTCO_" + VERSION + \
+                     "_????_Monthly.nc")
 
   do vv = 0, dimsizes(VAR) - 1
 
@@ -99,6 +100,11 @@ begin
 
     ; Set global attributes
     gAtt = set_global_atts(OBSNAME, TIER, SOURCE, REF, COMMENT)
+    
+    ; Add global attributes for details on the dataset
+    gAtt@description = "BS Filled Total Column Ozone Database"
+    gAtt@version = OBSNAME + " " + VERSION
+    gAtt@time_range = YEAR1 + "-" + YEAR2
 
     ; Output file
     DATESTR = YEAR1 + "01-" + YEAR2 + "12"
